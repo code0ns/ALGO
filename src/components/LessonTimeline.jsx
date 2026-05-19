@@ -13,24 +13,18 @@ import {
 } from 'recharts';
 import { ArrowUp, ArrowDown, Info } from 'lucide-react';
 
-// Interactive lesson visualization.
-// - Renders a price line + indicator overlays + horizontal bands.
-// - Bottom panel (optional) for RSI-style sub-indicators.
-// - Scrubber controls how much of the chart is "revealed" — entry/exit markers
-//   only appear once their index is within the revealed range.
-// - The most recent triggered trade event's annotation is shown below the chart.
+// Interactive lesson chart with a scrubber that progressively reveals the timeline.
+// Y/X-axis domain is computed from the full series so the chart geometry never changes
+// as the user scrolls — only the visible portion of the line moves.
 export default function LessonTimeline({ chart }) {
   const { series, overlays = [], bands = [], bottom, trades = [], hidePricePanel = false } = chart;
   const lastIndex = series.length - 1;
-  const [scrub, setScrub] = useState(lastIndex); // default: fully revealed
+  const [scrub, setScrub] = useState(lastIndex);
 
   const visibleData = useMemo(() => series.slice(0, scrub + 1), [series, scrub]);
-
-  // Trade events triggered up to current scrub position
   const triggered = trades.filter((t) => t.atIndex <= scrub);
   const lastEvent = triggered[triggered.length - 1];
 
-  // Y-axis domain for the price chart — keep stable across scrubs so the line doesn't jump.
   const yKeys = hidePricePanel ? overlays.map((o) => o.key) : ['price', ...overlays.map((o) => o.key)];
   const allValues = series.flatMap((p) => yKeys.map((k) => p[k]).filter((v) => v != null));
   const yMin = Math.floor(Math.min(...allValues, ...bands.map((b) => b.at)) - 2);
@@ -38,7 +32,6 @@ export default function LessonTimeline({ chart }) {
 
   return (
     <div className="lesson-timeline">
-      {/* Main price chart */}
       <div style={{ height: 240, marginBottom: 8 }}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={visibleData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
@@ -78,7 +71,6 @@ export default function LessonTimeline({ chart }) {
               labelFormatter={(l) => `Day ${l}`}
             />
 
-            {/* Horizontal reference bands (support/resistance/breakout) */}
             {bands.map((b) => (
               <ReferenceLine
                 key={b.label}
@@ -89,22 +81,18 @@ export default function LessonTimeline({ chart }) {
               />
             ))}
 
-            {/* Price (area + line). Hidden for copy-trading where 'price' isn't used. */}
             {!hidePricePanel && (
-              <>
-                <Area
-                  type="monotone"
-                  dataKey="price"
-                  stroke="var(--accent-primary)"
-                  strokeWidth={2}
-                  fill="url(#priceFill)"
-                  isAnimationActive={false}
-                  name="Price"
-                />
-              </>
+              <Area
+                type="monotone"
+                dataKey="price"
+                stroke="var(--accent-primary)"
+                strokeWidth={2}
+                fill="url(#priceFill)"
+                isAnimationActive={false}
+                name="Price"
+              />
             )}
 
-            {/* Overlay lines (SMA, lead-trader price, etc.) */}
             {overlays.map((o) => (
               <Line
                 key={o.key}
@@ -118,7 +106,6 @@ export default function LessonTimeline({ chart }) {
               />
             ))}
 
-            {/* Trade markers — only render if revealed by scrub */}
             {triggered.map((t) => {
               const point = series[t.atIndex];
               const yKey = hidePricePanel ? overlays[0]?.key : 'price';
@@ -140,18 +127,12 @@ export default function LessonTimeline({ chart }) {
         </ResponsiveContainer>
       </div>
 
-      {/* Bottom panel (RSI etc.) */}
       {bottom && (
         <div style={{ height: 110, marginBottom: 8 }}>
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={visibleData} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="var(--border-color)" strokeDasharray="3 3" vertical={false} />
-              <XAxis
-                dataKey="i"
-                type="number"
-                domain={[0, lastIndex]}
-                hide
-              />
+              <XAxis dataKey="i" type="number" domain={[0, lastIndex]} hide />
               <YAxis
                 domain={[bottom.min, bottom.max]}
                 tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
@@ -191,7 +172,6 @@ export default function LessonTimeline({ chart }) {
         </div>
       )}
 
-      {/* Scrubber */}
       <div className="scrubber-wrap">
         <div className="scrubber-label">
           <span className="text-muted" style={{ fontSize: '12px' }}>
@@ -208,13 +188,10 @@ export default function LessonTimeline({ chart }) {
         />
       </div>
 
-      {/* Annotation callout */}
       <div className="lesson-callout">
         {lastEvent ? (
           <>
-            <div
-              className={`lesson-callout-icon ${lastEvent.type === 'entry' ? 'entry' : 'exit'}`}
-            >
+            <div className={`lesson-callout-icon ${lastEvent.type === 'entry' ? 'entry' : 'exit'}`}>
               {lastEvent.type === 'entry' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
             </div>
             <div style={{ flex: 1 }}>
@@ -226,9 +203,7 @@ export default function LessonTimeline({ chart }) {
           </>
         ) : (
           <>
-            <div className="lesson-callout-icon">
-              <Info size={14} />
-            </div>
+            <div className="lesson-callout-icon"><Info size={14} /></div>
             <p className="text-secondary" style={{ fontSize: '13px' }}>
               Scroll forward to see when the strategy triggers a trade.
             </p>
@@ -236,7 +211,6 @@ export default function LessonTimeline({ chart }) {
         )}
       </div>
 
-      {/* Legend */}
       <div className="lesson-legend">
         {!hidePricePanel && (
           <span className="legend-item">

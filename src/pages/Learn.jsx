@@ -4,7 +4,6 @@ import { ArrowLeft, BookOpen, ChevronRight } from 'lucide-react';
 import { LESSONS } from '../data/lessons';
 import LessonModal from '../components/LessonModal';
 
-// Grid of lesson cards. Click → open lesson modal with the scrubbable chart.
 export default function Learn() {
   const navigate = useNavigate();
   const [openLessonId, setOpenLessonId] = useState(null);
@@ -47,23 +46,15 @@ export default function Learn() {
                   Lesson {lesson.number}
                 </span>
               </div>
-              <h3 style={{ fontSize: '24px', fontWeight: 500, margin: '8px 0 12px' }}>
-                {lesson.title}
-              </h3>
-              <p className="text-secondary" style={{ fontSize: '14px', lineHeight: 1.5 }}>
-                {lesson.summary}
-              </p>
-              <div className="lesson-card-cta">
-                Open lesson <ChevronRight size={14} />
-              </div>
+              <h3 style={{ fontSize: '24px', fontWeight: 500, margin: '8px 0 12px' }}>{lesson.title}</h3>
+              <p className="text-secondary" style={{ fontSize: '14px', lineHeight: 1.5 }}>{lesson.summary}</p>
+              <div className="lesson-card-cta">Open lesson <ChevronRight size={14} /></div>
             </button>
           ))}
         </div>
       </main>
 
-      {openLesson && (
-        <LessonModal lesson={openLesson} onClose={() => setOpenLessonId(null)} />
-      )}
+      {openLesson && <LessonModal lesson={openLesson} onClose={() => setOpenLessonId(null)} />}
     </div>
   );
 }

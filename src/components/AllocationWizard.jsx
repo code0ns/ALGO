@@ -4,8 +4,6 @@ import { ArrowRight, Check } from 'lucide-react';
 import Modal from './Modal';
 import { RISK_PRESETS, projectGrowth, formatCurrency } from '../data/mock';
 
-// 3-step wizard: name → amount + risk → preview & confirm.
-// onCreate(plan) is called when the user clicks "Activate plan".
 export default function AllocationWizard({ onClose, onCreate }) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState('');
@@ -22,13 +20,7 @@ export default function AllocationWizard({ onClose, onCreate }) {
   const canNext = step === 1 ? name.trim().length >= 2 : true;
 
   return (
-    <Modal
-      title="New allocation"
-      subtitle={`Step ${step} of 3`}
-      onClose={onClose}
-      width={560}
-    >
-      {/* Progress bar */}
+    <Modal title="New allocation" subtitle={`Step ${step} of 3`} onClose={onClose} width={560}>
       <div className="wizard-progress">
         {[1, 2, 3].map((s) => (
           <div key={s} className={`wizard-progress-step ${s <= step ? 'active' : ''}`} />
@@ -143,11 +135,7 @@ export default function AllocationWizard({ onClose, onCreate }) {
           <button className="btn-ghost" onClick={onClose}>Cancel</button>
         )}
         {step < 3 ? (
-          <button
-            className="btn-primary"
-            disabled={!canNext}
-            onClick={() => setStep(step + 1)}
-          >
+          <button className="btn-primary" disabled={!canNext} onClick={() => setStep(step + 1)}>
             Continue <ArrowRight size={16} />
           </button>
         ) : (

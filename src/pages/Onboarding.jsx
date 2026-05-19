@@ -4,14 +4,12 @@ import { ShieldCheck, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import { RISK_PRESETS, projectGrowth, formatCurrency } from '../data/mock';
 
-// 3-step onboarding: monthly amount → risk tolerance → goal.
-// On finish, hands the new user straight to a dashboard that reflects their setup.
 export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState(500);
   const [risk, setRisk] = useState('Medium');
-  const [goal, setGoal] = useState('Long-term wealth');
+  const [goal] = useState('Long-term wealth');
 
   const projection = useMemo(
     () => projectGrowth({ monthlyContribution: amount, riskKey: risk, years: 20 }),
@@ -20,8 +18,6 @@ export default function Onboarding() {
   const projected20y = projection[projection.length - 1].value;
 
   const finish = () => {
-    // In a real app we'd POST this setup to the backend / broker API.
-    // For the prototype, we just hand off to the dashboard.
     navigate('/dashboard', {
       state: { newPlan: { amount, risk, goal } },
     });
@@ -34,9 +30,7 @@ export default function Onboarding() {
           <ShieldCheck size={22} />
           Infrastructure.
         </div>
-        <button className="btn-ghost" onClick={() => navigate('/')}>
-          Exit setup
-        </button>
+        <button className="btn-ghost" onClick={() => navigate('/')}>Exit setup</button>
       </header>
 
       <main className="onboarding-main">
@@ -51,9 +45,7 @@ export default function Onboarding() {
 
         {step === 1 && (
           <section>
-            <h1 style={{ fontSize: '32px', marginBottom: '12px' }}>
-              How much can you set aside each month?
-            </h1>
+            <h1 style={{ fontSize: '32px', marginBottom: '12px' }}>How much can you set aside each month?</h1>
             <p className="text-secondary" style={{ fontSize: '16px', marginBottom: '32px' }}>
               Pick an amount you won't miss. You can change it anytime.
             </p>
@@ -76,9 +68,7 @@ export default function Onboarding() {
 
         {step === 2 && (
           <section>
-            <h1 style={{ fontSize: '32px', marginBottom: '12px' }}>
-              How much swing can you handle?
-            </h1>
+            <h1 style={{ fontSize: '32px', marginBottom: '12px' }}>How much swing can you handle?</h1>
             <p className="text-secondary" style={{ fontSize: '16px', marginBottom: '32px' }}>
               Higher risk usually means higher returns over the long run — but bigger drops along the way. The infrastructure will enforce strict limits regardless.
             </p>
@@ -95,9 +85,7 @@ export default function Onboarding() {
                       ~{Math.round(preset.expectedAnnualReturn * 100)}%/yr · max −{preset.maxDrawdownPct}% drawdown
                     </span>
                   </div>
-                  <p className="text-secondary" style={{ fontSize: '14px', marginTop: '8px' }}>
-                    {preset.blurb}
-                  </p>
+                  <p className="text-secondary" style={{ fontSize: '14px', marginTop: '8px' }}>{preset.blurb}</p>
                 </button>
               ))}
             </div>
@@ -110,7 +98,6 @@ export default function Onboarding() {
             <p className="text-secondary" style={{ fontSize: '16px', marginBottom: '24px' }}>
               Here's what your infrastructure will quietly do over the next 20 years if nothing changes:
             </p>
-
             <div style={{ display: 'flex', gap: '32px', marginBottom: '16px', flexWrap: 'wrap' }}>
               <div>
                 <p className="text-muted" style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>You contribute</p>
@@ -125,7 +112,6 @@ export default function Onboarding() {
                 <p style={{ fontSize: '28px', fontWeight: 500 }}>{risk}</p>
               </div>
             </div>
-
             <div style={{ height: '220px', marginBottom: '24px' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={projection} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
@@ -145,7 +131,6 @@ export default function Onboarding() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-
             <div className="info-box">
               Projections use historical averages and are not guaranteed. Real returns will fluctuate.
               The infrastructure caps drawdown at {RISK_PRESETS[risk].maxDrawdownPct}% to protect you.
@@ -155,10 +140,7 @@ export default function Onboarding() {
       </main>
 
       <footer className="onboarding-footer">
-        <button
-          className="btn-ghost"
-          onClick={() => (step === 1 ? navigate('/') : setStep(step - 1))}
-        >
+        <button className="btn-ghost" onClick={() => (step === 1 ? navigate('/') : setStep(step - 1))}>
           <ArrowLeft size={16} /> Back
         </button>
         {step < 3 ? (

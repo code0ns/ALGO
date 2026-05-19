@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
-// Lightweight modal wrapper used by AllocationWizard and RiskLimitsPanel.
-// Closes on Esc or backdrop click. Keeps focus simple — fine for a prototype.
 export default function Modal({ title, subtitle, onClose, children, width = 520 }) {
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };

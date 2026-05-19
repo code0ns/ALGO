@@ -3,15 +3,9 @@ import { BookOpen } from 'lucide-react';
 import Modal from './Modal';
 import LessonTimeline from './LessonTimeline';
 
-// Lesson detail view — matches the lovable.app card style, plus a live chart.
 export default function LessonModal({ lesson, onClose }) {
   return (
-    <Modal
-      title={lesson.title}
-      subtitle={null}
-      onClose={onClose}
-      width={760}
-    >
+    <Modal title={lesson.title} subtitle={null} onClose={onClose} width={760}>
       <div className="lesson-modal-header">
         <BookOpen size={14} />
         <span>LESSON · LEVEL {lesson.number}</span>
@@ -33,7 +27,6 @@ export default function LessonModal({ lesson, onClose }) {
         <p style={{ fontSize: '14px', color: 'var(--text-primary)', lineHeight: 1.5 }}>{lesson.example}</p>
       </div>
 
-      {/* Scrubbable visualization */}
       <div style={{ marginTop: '24px' }}>
         <h4 className="lesson-section-title">See it in action</h4>
         <p className="text-secondary" style={{ fontSize: '13px', marginBottom: '12px' }}>

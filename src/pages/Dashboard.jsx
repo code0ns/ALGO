@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -8,6 +8,7 @@ import {
   Activity,
   ShieldAlert,
   BookOpen,
+  Check,
 } from 'lucide-react';
 import {
   LineChart,
@@ -17,27 +18,24 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  AreaChart,
-  Area,
 } from 'recharts';
 
 import {
   RISK_PRESETS,
-  projectGrowth,
   HISTORICAL_DEFAULT,
   INITIAL_PLANS,
   formatCurrency,
 } from '../data/mock';
 import AllocationWizard from '../components/AllocationWizard';
-import RiskLimitsPanel from '../components/RiskLimitsPanel';
 import ActivityLog from '../components/ActivityLog';
 import BrokerStatus from '../components/BrokerStatus';
+
+const ALL_ASSETS = ['Bonds', 'Index ETFs', 'Blue-chip stocks', 'Growth stocks', 'Crypto (limited)'];
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If the user came from onboarding, prepend their freshly-configured plan.
   const [plans, setPlans] = useState(() => {
     const onboarded = location.state?.newPlan;
     if (!onboarded) return INITIAL_PLANS;
@@ -60,22 +58,7 @@ export default function Dashboard() {
   });
 
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [limitsForPlan, setLimitsForPlan] = useState(null);
-
-  // Interactive projection: user drags a slider, the long-term curve updates.
-  const [projContribution, setProjContribution] = useState(750);
-  const [projYears, setProjYears] = useState(10);
-  const [projRisk, setProjRisk] = useState('Medium');
-  const futureCurve = useMemo(
-    () => projectGrowth({
-      monthlyContribution: projContribution,
-      riskKey: projRisk,
-      years: projYears,
-      startingValue: HISTORICAL_DEFAULT[HISTORICAL_DEFAULT.length - 1].value,
-    }),
-    [projContribution, projYears, projRisk]
-  );
-  const projectedEnd = futureCurve[futureCurve.length - 1].value;
+  const [expandedSettingsId, setExpandedSettingsId] = useState(null);
 
   const totalActiveAllocation = plans
     .filter((p) => p.active)
@@ -83,6 +66,9 @@ export default function Dashboard() {
 
   const togglePlan = (id) =>
     setPlans(plans.map((p) => (p.id === id ? { ...p, active: !p.active } : p)));
+
+  const updateLimits = (planId, limits) =>
+    setPlans(plans.map((p) => (p.id === planId ? { ...p, limits } : p)));
 
   const currentValue = HISTORICAL_DEFAULT[HISTORICAL_DEFAULT.length - 1].value;
 
@@ -139,89 +125,7 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* Interactive projection — the "wow" moment */}
-        <section style={{ marginBottom: '40px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '20px' }}>Project your future</h3>
-            <p className="text-muted" style={{ fontSize: '13px' }}>Adjust the sliders to see what happens</p>
-          </div>
-
-          <div className="card" style={{ padding: '24px' }}>
-            <div className="projection-controls">
-              <div>
-                <label className="field-label">Monthly contribution</label>
-                <div style={{ fontSize: '24px', fontWeight: 500, marginBottom: '4px' }}>{formatCurrency(projContribution)}</div>
-                <input
-                  type="range"
-                  min="50"
-                  max="3000"
-                  step="50"
-                  value={projContribution}
-                  onChange={(e) => setProjContribution(Number(e.target.value))}
-                  className="slider"
-                />
-              </div>
-              <div>
-                <label className="field-label">Years</label>
-                <div style={{ fontSize: '24px', fontWeight: 500, marginBottom: '4px' }}>{projYears} years</div>
-                <input
-                  type="range"
-                  min="1"
-                  max="30"
-                  step="1"
-                  value={projYears}
-                  onChange={(e) => setProjYears(Number(e.target.value))}
-                  className="slider"
-                />
-              </div>
-              <div>
-                <label className="field-label">Risk</label>
-                <div className="risk-tabs">
-                  {Object.keys(RISK_PRESETS).map((k) => (
-                    <button
-                      key={k}
-                      className={`risk-tab ${projRisk === k ? 'active' : ''}`}
-                      onClick={() => setProjRisk(k)}
-                    >
-                      {k}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '20px', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-              <span className="text-secondary" style={{ fontSize: '14px' }}>
-                Projected value in {projYears} years:
-              </span>
-              <span style={{ fontSize: '28px', fontWeight: 500, color: 'var(--status-active)' }}>
-                {formatCurrency(projectedEnd)}
-              </span>
-            </div>
-
-            <div style={{ height: '200px' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={futureCurve} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="dashFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--status-active)" stopOpacity={0.25} />
-                      <stop offset="100%" stopColor="var(--status-active)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} interval={Math.max(1, Math.floor(futureCurve.length / 6))} />
-                  <YAxis hide />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', fontSize: '12px' }}
-                    formatter={(v) => formatCurrency(v)}
-                  />
-                  <Area type="monotone" dataKey="value" stroke="var(--status-active)" strokeWidth={2} fill="url(#dashFill)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </section>
-
-        {/* Active plans */}
+        {/* Active plans with inline expandable risk settings */}
         <section style={{ marginBottom: '40px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <h3 style={{ fontSize: '20px' }}>Active allocations</h3>
@@ -231,49 +135,66 @@ export default function Dashboard() {
           </div>
 
           <div style={{ display: 'grid', gap: '16px' }}>
-            {plans.map((plan) => (
-              <div key={plan.id} className="card plan-row">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                  <div className={`plan-avatar ${plan.active ? 'on' : ''}`}>
-                    <Activity size={24} />
-                  </div>
-                  <div>
-                    <h4 style={{ fontSize: '16px', marginBottom: '4px', fontWeight: 500, color: plan.active ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                      {plan.name}
-                    </h4>
-                    <div style={{ display: 'flex', gap: '12px', fontSize: '14px', flexWrap: 'wrap' }} className="text-secondary">
-                      <span>Monthly: {formatCurrency(plan.allocation)}</span>
-                      <span>·</span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <ShieldAlert size={14} /> Max drawdown: {plan.limits.maxDrawdownPct}%
+            {plans.map((plan) => {
+              const isExpanded = expandedSettingsId === plan.id;
+              return (
+                <div key={plan.id} className="card" style={{ overflow: 'hidden' }}>
+                  <div className="plan-row">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                      <div className={`plan-avatar ${plan.active ? 'on' : ''}`}>
+                        <Activity size={24} />
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: '16px', marginBottom: '4px', fontWeight: 500, color: plan.active ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                          {plan.name}
+                        </h4>
+                        <div style={{ display: 'flex', gap: '12px', fontSize: '14px', flexWrap: 'wrap' }} className="text-secondary">
+                          <span>Monthly: {formatCurrency(plan.allocation)}</span>
+                          <span>·</span>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <ShieldAlert size={14} /> Max drawdown: {plan.limits.maxDrawdownPct}%
+                          </span>
+                          <span>·</span>
+                          <span>{plan.risk} risk</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span className={`status-badge ${plan.active ? 'on' : 'off'}`}>
+                        {plan.active ? 'Active' : 'Paused'}
                       </span>
-                      <span>·</span>
-                      <span>{plan.risk} risk</span>
+                      <button
+                        onClick={() => togglePlan(plan.id)}
+                        className={`icon-btn ${plan.active ? '' : 'icon-btn-primary'}`}
+                        title={plan.active ? 'Pause Allocation' : 'Resume Allocation'}
+                      >
+                        <Power size={18} />
+                      </button>
+                      <button
+                        className={`icon-btn ${isExpanded ? 'icon-btn-active' : ''}`}
+                        onClick={() => setExpandedSettingsId(isExpanded ? null : plan.id)}
+                        title="Risk limits"
+                        aria-expanded={isExpanded}
+                      >
+                        <Settings size={18} />
+                      </button>
                     </div>
                   </div>
-                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <span className={`status-badge ${plan.active ? 'on' : 'off'}`}>
-                    {plan.active ? 'Active' : 'Paused'}
-                  </span>
-                  <button
-                    onClick={() => togglePlan(plan.id)}
-                    className={`icon-btn ${plan.active ? '' : 'icon-btn-primary'}`}
-                    title={plan.active ? 'Pause Allocation' : 'Resume Allocation'}
-                  >
-                    <Power size={18} />
-                  </button>
-                  <button
-                    className="icon-btn"
-                    onClick={() => setLimitsForPlan(plan)}
-                    title="Configure risk limits"
-                  >
-                    <Settings size={18} />
-                  </button>
+                  {isExpanded && (
+                    <InlineRiskSettings
+                      plan={plan}
+                      onSave={(limits) => {
+                        updateLimits(plan.id, limits);
+                        setExpandedSettingsId(null);
+                      }}
+                      onCancel={() => setExpandedSettingsId(null)}
+                    />
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 
@@ -281,7 +202,7 @@ export default function Dashboard() {
         <section>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h3 style={{ fontSize: '20px' }}>What the infrastructure did</h3>
-            <p className="text-muted" style={{ fontSize: '13px' }}>Last 30 days</p>
+            <p className="text-muted" style={{ fontSize: '13px' }}>Click a trade for details · Last 30 days</p>
           </div>
           <ActivityLog />
         </section>
@@ -293,16 +214,85 @@ export default function Dashboard() {
           onCreate={(plan) => setPlans([plan, ...plans])}
         />
       )}
+    </div>
+  );
+}
 
-      {limitsForPlan && (
-        <RiskLimitsPanel
-          plan={limitsForPlan}
-          onClose={() => setLimitsForPlan(null)}
-          onSave={(limits) => {
-            setPlans(plans.map((p) => (p.id === limitsForPlan.id ? { ...p, limits } : p)));
-          }}
-        />
-      )}
+// --- Inline risk settings panel (no longer a modal) -----------------------
+function InlineRiskSettings({ plan, onSave, onCancel }) {
+  const [limits, setLimits] = useState(plan.limits);
+
+  const toggleAsset = (asset) => {
+    setLimits((l) => ({
+      ...l,
+      allowedAssets: l.allowedAssets.includes(asset)
+        ? l.allowedAssets.filter((a) => a !== asset)
+        : [...l.allowedAssets, asset],
+    }));
+  };
+
+  return (
+    <div className="inline-risk-panel">
+      <p className="text-muted" style={{ fontSize: '12px', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+        Risk limits — hard caps the infrastructure enforces on every trade
+      </p>
+
+      <div className="inline-risk-grid">
+        <div>
+          <label className="field-label" style={{ marginBottom: '4px' }}>Max drawdown</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <span style={{ fontSize: '20px', fontWeight: 500 }}>{limits.maxDrawdownPct}%</span>
+            <span className="text-muted" style={{ fontSize: '12px' }}>Auto-pause beyond this</span>
+          </div>
+          <input
+            type="range"
+            min="3"
+            max="50"
+            step="1"
+            value={limits.maxDrawdownPct}
+            onChange={(e) => setLimits({ ...limits, maxDrawdownPct: Number(e.target.value) })}
+            className="slider"
+          />
+          <div className="slider-range-labels"><span>3%</span><span>50%</span></div>
+        </div>
+
+        <div>
+          <label className="field-label" style={{ marginBottom: '4px' }}>Max single position</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <span style={{ fontSize: '20px', fontWeight: 500 }}>{limits.maxSinglePositionPct}%</span>
+            <span className="text-muted" style={{ fontSize: '12px' }}>No single asset above this</span>
+          </div>
+          <input
+            type="range"
+            min="5"
+            max="100"
+            step="5"
+            value={limits.maxSinglePositionPct}
+            onChange={(e) => setLimits({ ...limits, maxSinglePositionPct: Number(e.target.value) })}
+            className="slider"
+          />
+          <div className="slider-range-labels"><span>5%</span><span>100%</span></div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: '20px' }}>
+        <label className="field-label" style={{ marginBottom: '6px' }}>Allowed asset categories</label>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+          {ALL_ASSETS.map((a) => {
+            const on = limits.allowedAssets.includes(a);
+            return (
+              <button key={a} onClick={() => toggleAsset(a)} className={`chip ${on ? 'chip-on' : ''}`}>
+                {on && <Check size={14} />} {a}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '20px' }}>
+        <button className="btn-ghost" onClick={onCancel}>Cancel</button>
+        <button className="btn-primary" onClick={() => onSave(limits)}>Save limits</button>
+      </div>
     </div>
   );
 }
