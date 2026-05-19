@@ -30,14 +30,8 @@ export default function AllocationWizard({ onClose, onCreate }) {
       {step === 1 && (
         <div>
           <label className="field-label">Give this allocation a name</label>
-          <input
-            autoFocus
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. House deposit fund"
-            className="input"
-          />
+          <input autoFocus type="text" value={name} onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. House deposit fund" className="input" />
           <p className="text-muted" style={{ fontSize: '13px', marginTop: '8px' }}>
             You'll see this name on your dashboard. You can change it later.
           </p>
@@ -48,15 +42,8 @@ export default function AllocationWizard({ onClose, onCreate }) {
         <div>
           <label className="field-label">Monthly contribution</label>
           <div className="amount-display">{formatCurrency(allocation)}</div>
-          <input
-            type="range"
-            min="50"
-            max="2000"
-            step="50"
-            value={allocation}
-            onChange={(e) => setAllocation(Number(e.target.value))}
-            className="slider"
-          />
+          <input type="range" min="50" max="2000" step="50" value={allocation}
+            onChange={(e) => setAllocation(Number(e.target.value))} className="slider" />
           <div className="slider-range-labels">
             <span>$50</span>
             <span>$2,000</span>
@@ -65,20 +52,14 @@ export default function AllocationWizard({ onClose, onCreate }) {
           <label className="field-label" style={{ marginTop: '32px' }}>Risk profile</label>
           <div className="risk-options">
             {Object.entries(RISK_PRESETS).map(([key, preset]) => (
-              <button
-                key={key}
-                onClick={() => setRisk(key)}
-                className={`risk-option ${risk === key ? 'selected' : ''}`}
-              >
+              <button key={key} onClick={() => setRisk(key)} className={`risk-option ${risk === key ? 'selected' : ''}`}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <span style={{ fontWeight: 500 }}>{preset.label}</span>
                   <span className="text-muted" style={{ fontSize: '13px' }}>
                     ~{Math.round(preset.expectedAnnualReturn * 100)}%/yr
                   </span>
                 </div>
-                <p className="text-secondary" style={{ fontSize: '13px', marginTop: '6px' }}>
-                  {preset.blurb}
-                </p>
+                <p className="text-secondary" style={{ fontSize: '13px', marginTop: '6px' }}>{preset.blurb}</p>
               </button>
             ))}
           </div>
@@ -112,10 +93,7 @@ export default function AllocationWizard({ onClose, onCreate }) {
                 </defs>
                 <XAxis dataKey="month" hide />
                 <YAxis hide />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', fontSize: '12px' }}
-                  formatter={(v) => formatCurrency(v)}
-                />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', fontSize: '12px' }} formatter={(v) => formatCurrency(v)} />
                 <Area type="monotone" dataKey="value" stroke="var(--status-active)" strokeWidth={2} fill="url(#growthFill)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -129,35 +107,25 @@ export default function AllocationWizard({ onClose, onCreate }) {
       )}
 
       <footer className="modal-footer">
-        {step > 1 ? (
-          <button className="btn-ghost" onClick={() => setStep(step - 1)}>Back</button>
-        ) : (
-          <button className="btn-ghost" onClick={onClose}>Cancel</button>
-        )}
+        {step > 1 ? <button className="btn-ghost" onClick={() => setStep(step - 1)}>Back</button> : <button className="btn-ghost" onClick={onClose}>Cancel</button>}
         {step < 3 ? (
           <button className="btn-primary" disabled={!canNext} onClick={() => setStep(step + 1)}>
             Continue <ArrowRight size={16} />
           </button>
         ) : (
-          <button
-            className="btn-primary"
-            onClick={() => {
-              onCreate({
-                id: Date.now(),
-                name: name.trim(),
-                allocation,
-                risk,
-                active: true,
-                createdAt: 'May 2026',
-                limits: {
-                  maxDrawdownPct: RISK_PRESETS[risk].maxDrawdownPct,
-                  maxSinglePositionPct: RISK_PRESETS[risk].maxSinglePositionPct,
-                  allowedAssets: [...RISK_PRESETS[risk].allowedAssets],
-                },
-              });
-              onClose();
-            }}
-          >
+          <button className="btn-primary" onClick={() => {
+            onCreate({
+              id: Date.now(),
+              name: name.trim(),
+              allocation, risk, active: true, createdAt: 'May 2026',
+              limits: {
+                maxDrawdownPct: RISK_PRESETS[risk].maxDrawdownPct,
+                maxSinglePositionPct: RISK_PRESETS[risk].maxSinglePositionPct,
+                allowedAssets: [...RISK_PRESETS[risk].allowedAssets],
+              },
+            });
+            onClose();
+          }}>
             <Check size={16} /> Activate plan
           </button>
         )}

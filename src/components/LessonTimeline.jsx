@@ -1,21 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import {
-  ResponsiveContainer,
-  ComposedChart,
-  Line,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ReferenceLine,
-  ReferenceDot,
-  CartesianGrid,
+  ResponsiveContainer, ComposedChart, Line, Area, XAxis, YAxis, Tooltip,
+  ReferenceLine, ReferenceDot, CartesianGrid,
 } from 'recharts';
 import { ArrowUp, ArrowDown, Info } from 'lucide-react';
 
-// Interactive lesson chart with a scrubber that progressively reveals the timeline.
-// Y/X-axis domain is computed from the full series so the chart geometry never changes
-// as the user scrolls — only the visible portion of the line moves.
 export default function LessonTimeline({ chart }) {
   const { series, overlays = [], bands = [], bottom, trades = [], hidePricePanel = false } = chart;
   const lastIndex = series.length - 1;
@@ -42,68 +31,31 @@ export default function LessonTimeline({ chart }) {
               </linearGradient>
             </defs>
             <CartesianGrid stroke="var(--border-color)" strokeDasharray="3 3" vertical={false} />
-            <XAxis
-              dataKey="i"
-              type="number"
-              domain={[0, lastIndex]}
+            <XAxis dataKey="i" type="number" domain={[0, lastIndex]}
               ticks={[0, Math.round(lastIndex / 2), lastIndex]}
               tickFormatter={(v) => `Day ${v}`}
               tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              domain={[yMin, yMax]}
+              axisLine={false} tickLine={false} />
+            <YAxis domain={[yMin, yMax]}
               tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
-              axisLine={false}
-              tickLine={false}
-              width={48}
-              tickFormatter={(v) => `$${v}`}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'var(--bg-secondary)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
-                fontSize: '12px',
-              }}
-              formatter={(v, name) => [`$${v}`, name]}
-              labelFormatter={(l) => `Day ${l}`}
-            />
+              axisLine={false} tickLine={false} width={48}
+              tickFormatter={(v) => `$${v}`} />
+            <Tooltip contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', fontSize: '12px' }}
+              formatter={(v, name) => [`$${v}`, name]} labelFormatter={(l) => `Day ${l}`} />
 
             {bands.map((b) => (
-              <ReferenceLine
-                key={b.label}
-                y={b.at}
-                stroke={b.color}
-                strokeDasharray="4 4"
-                label={{ value: b.label, position: 'insideTopRight', fill: b.color, fontSize: 11 }}
-              />
+              <ReferenceLine key={b.label} y={b.at} stroke={b.color} strokeDasharray="4 4"
+                label={{ value: b.label, position: 'insideTopRight', fill: b.color, fontSize: 11 }} />
             ))}
 
             {!hidePricePanel && (
-              <Area
-                type="monotone"
-                dataKey="price"
-                stroke="var(--accent-primary)"
-                strokeWidth={2}
-                fill="url(#priceFill)"
-                isAnimationActive={false}
-                name="Price"
-              />
+              <Area type="monotone" dataKey="price" stroke="var(--accent-primary)" strokeWidth={2}
+                fill="url(#priceFill)" isAnimationActive={false} name="Price" />
             )}
 
             {overlays.map((o) => (
-              <Line
-                key={o.key}
-                type="monotone"
-                dataKey={o.key}
-                stroke={o.color}
-                strokeWidth={2}
-                dot={false}
-                isAnimationActive={false}
-                name={o.label}
-              />
+              <Line key={o.key} type="monotone" dataKey={o.key} stroke={o.color}
+                strokeWidth={2} dot={false} isAnimationActive={false} name={o.label} />
             ))}
 
             {triggered.map((t) => {
@@ -112,15 +64,9 @@ export default function LessonTimeline({ chart }) {
               const yVal = point[yKey];
               const isEntry = t.type === 'entry';
               return (
-                <ReferenceDot
-                  key={`${t.atIndex}-${t.type}`}
-                  x={t.atIndex}
-                  y={yVal}
-                  r={7}
+                <ReferenceDot key={`${t.atIndex}-${t.type}`} x={t.atIndex} y={yVal} r={7}
                   fill={isEntry ? 'var(--status-active)' : 'var(--status-paused)'}
-                  stroke="var(--bg-secondary)"
-                  strokeWidth={2}
-                />
+                  stroke="var(--bg-secondary)" strokeWidth={2} />
               );
             })}
           </ComposedChart>
@@ -133,40 +79,17 @@ export default function LessonTimeline({ chart }) {
             <ComposedChart data={visibleData} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="var(--border-color)" strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="i" type="number" domain={[0, lastIndex]} hide />
-              <YAxis
-                domain={[bottom.min, bottom.max]}
+              <YAxis domain={[bottom.min, bottom.max]}
                 tick={{ fontSize: 10, fill: 'var(--text-muted)' }}
-                axisLine={false}
-                tickLine={false}
-                width={48}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'var(--bg-secondary)',
-                  borderRadius: 'var(--radius-md)',
-                  border: '1px solid var(--border-color)',
-                  fontSize: '12px',
-                }}
-                labelFormatter={(l) => `Day ${l}`}
-              />
+                axisLine={false} tickLine={false} width={48} />
+              <Tooltip contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', fontSize: '12px' }}
+                labelFormatter={(l) => `Day ${l}`} />
               {bottom.bands?.map((b) => (
-                <ReferenceLine
-                  key={b.label}
-                  y={b.at}
-                  stroke={b.color}
-                  strokeDasharray="4 4"
-                  label={{ value: b.label, position: 'insideTopRight', fill: b.color, fontSize: 10 }}
-                />
+                <ReferenceLine key={b.label} y={b.at} stroke={b.color} strokeDasharray="4 4"
+                  label={{ value: b.label, position: 'insideTopRight', fill: b.color, fontSize: 10 }} />
               ))}
-              <Line
-                type="monotone"
-                dataKey={bottom.key}
-                stroke="var(--accent-primary)"
-                strokeWidth={2}
-                dot={false}
-                isAnimationActive={false}
-                name={bottom.label}
-              />
+              <Line type="monotone" dataKey={bottom.key} stroke="var(--accent-primary)"
+                strokeWidth={2} dot={false} isAnimationActive={false} name={bottom.label} />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
@@ -178,14 +101,9 @@ export default function LessonTimeline({ chart }) {
             Drag to scroll through time · Day {scrub + 1} of {series.length}
           </span>
         </div>
-        <input
-          type="range"
-          min={0}
-          max={lastIndex}
-          value={scrub}
+        <input type="range" min={0} max={lastIndex} value={scrub}
           onChange={(e) => setScrub(Number(e.target.value))}
-          className="slider scrubber"
-        />
+          className="slider scrubber" />
       </div>
 
       <div className="lesson-callout">

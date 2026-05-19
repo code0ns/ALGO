@@ -140,9 +140,7 @@ function buildBreakoutSeries() {
 
 export const LESSONS = [
   {
-    id: 'markets',
-    number: 1,
-    title: 'Markets',
+    id: 'markets', number: 1, title: 'Markets',
     summary: "A market is just buyers and sellers agreeing on a price. When more people want to buy than sell, the price goes up. That's it.",
     howItWorks: 'You buy an asset (a share, an ETF, a coin) at one price. Later you sell it at another. The difference is your profit or loss. Markets move because new information, news, or sentiment shifts what people are willing to pay.',
     example: "You buy 10 shares of an ETF at $100. A few weeks later it's $108. You sell. You made $80 (minus tiny fees). If it dropped to $94 instead, you'd be down $60.",
@@ -150,20 +148,15 @@ export const LESSONS = [
       { term: 'Position', def: 'An asset you currently hold, with a buy price and a size.' },
       { term: 'P&L', def: "Profit and Loss - how much you're up or down on a position." },
     ],
-    chart: {
-      series: buildMarketsSeries(),
-      overlays: [],
+    chart: { series: buildMarketsSeries(), overlays: [],
       trades: [
         { atIndex: 10, type: 'entry', annotation: 'You buy 10 shares at the current price. This opens a position.' },
         { atIndex: 48, type: 'exit', annotation: 'You sell. Price moved up - that difference, times your position size, is your profit.' },
       ],
     },
   },
-
   {
-    id: 'indicators',
-    number: 2,
-    title: 'Indicators',
+    id: 'indicators', number: 2, title: 'Indicators',
     summary: 'Indicators like RSI and Moving Averages help you spot when an asset is overbought or oversold. They give you signals instead of guesses.',
     howItWorks: "Indicators are math run over recent prices to produce a signal. They don't predict the future - they summarise what just happened so you can react with rules instead of feelings.",
     example: "RSI above 70 often means an asset is 'overbought' and may pull back. Below 30, it's 'oversold' and may bounce.",
@@ -171,13 +164,9 @@ export const LESSONS = [
       { term: 'RSI', def: 'Relative Strength Index, 0-100 momentum gauge.' },
       { term: 'SMA', def: 'Simple Moving Average - average of last N prices.' },
     ],
-    chart: {
-      series: buildRsiSeries(),
+    chart: { series: buildRsiSeries(),
       overlays: [{ key: 'sma', label: '20-day SMA', color: 'var(--accent-secondary)' }],
-      bottom: {
-        key: 'rsi',
-        label: 'RSI (14)',
-        min: 0, max: 100,
+      bottom: { key: 'rsi', label: 'RSI (14)', min: 0, max: 100,
         bands: [
           { at: 30, label: 'Oversold (30)', color: 'var(--status-active)' },
           { at: 70, label: 'Overbought (70)', color: 'var(--status-paused)' },
@@ -189,11 +178,8 @@ export const LESSONS = [
       ],
     },
   },
-
   {
-    id: 'technical-analysis',
-    number: 3,
-    title: 'Technical Analysis',
+    id: 'technical-analysis', number: 3, title: 'Technical Analysis',
     summary: 'Technical analysis reads patterns in price charts - support, resistance, trend lines. It turns the chart into a map.',
     howItWorks: "TA assumes the chart already reflects all known information. Instead of valuing the company, you study the crowd's behaviour through price and volume.",
     example: "A price keeps bouncing off $95 - that's support. Break it and traders expect a drop to the next level.",
@@ -201,9 +187,7 @@ export const LESSONS = [
       { term: 'Support', def: 'A price floor where buyers tend to step in.' },
       { term: 'Resistance', def: 'A price ceiling where sellers tend to take profit.' },
     ],
-    chart: {
-      series: buildSupportResistanceSeries(),
-      overlays: [],
+    chart: { series: buildSupportResistanceSeries(), overlays: [],
       bands: [
         { at: 95, label: 'Support', color: 'var(--status-active)' },
         { at: 110, label: 'Resistance', color: 'var(--status-paused)' },
@@ -217,11 +201,8 @@ export const LESSONS = [
       ],
     },
   },
-
   {
-    id: 'strategies',
-    number: 4,
-    title: 'Strategies',
+    id: 'strategies', number: 4, title: 'Strategies',
     summary: 'A strategy is a repeatable set of rules. Consistency beats intuition over time.',
     howItWorks: 'A strategy turns trading into a process: defined entry, exit, position size, and risk per trade. Edge comes from running it for many trades, not winning any single one.',
     example: "'Buy when price closes above 20-day SMA, sell when it closes below.' Same rule, every day, no exceptions.",
@@ -229,8 +210,7 @@ export const LESSONS = [
       { term: 'Edge', def: 'A statistical advantage that pays off over many trades.' },
       { term: 'Drawdown', def: 'Peak-to-trough loss on your account.' },
     ],
-    chart: {
-      series: buildSmaCrossoverSeries(),
+    chart: { series: buildSmaCrossoverSeries(),
       overlays: [{ key: 'sma', label: '20-day SMA', color: 'var(--accent-secondary)' }],
       trades: [
         { atIndex: 28, type: 'entry', annotation: 'Price closed above the 20-day SMA - strategy rule triggers a buy.' },
@@ -238,11 +218,8 @@ export const LESSONS = [
       ],
     },
   },
-
   {
-    id: 'copy-trading',
-    number: 5,
-    title: 'Copy Trading',
+    id: 'copy-trading', number: 5, title: 'Copy Trading',
     summary: 'Copy trading lets you mirror experienced traders. Useful, but you only learn if you understand why they trade.',
     howItWorks: "You allocate capital to follow another trader's live trades automatically. It's a shortcut to expertise - and to inheriting their mistakes.",
     example: 'Allocate 10% of capital to a top trader. Every trade they place, your account places proportionally.',
@@ -250,8 +227,7 @@ export const LESSONS = [
       { term: 'Lead trader', def: 'The trader whose moves you mirror.' },
       { term: 'Allocation', def: 'Share of capital assigned to a strategy or trader.' },
     ],
-    chart: {
-      series: buildCopyTradingSeries(),
+    chart: { series: buildCopyTradingSeries(),
       overlays: [
         { key: 'leadPrice', label: 'Lead trader account', color: 'var(--accent-primary)' },
         { key: 'yourPrice', label: 'Your account (40% allocation)', color: 'var(--status-active)' },
@@ -263,11 +239,8 @@ export const LESSONS = [
       ],
     },
   },
-
   {
-    id: 'automated-trading',
-    number: 6,
-    title: 'Automated Trading',
+    id: 'automated-trading', number: 6, title: 'Automated Trading',
     summary: "Bots execute strategies 24/7 without emotion. The hard part isn't running them - it's designing one that actually works.",
     howItWorks: 'An algo trades by rules without human input. Removing emotion is the easy win. The real work is backtesting, managing risk, and knowing when to turn it off.',
     example: 'A breakout bot watches 50 assets at once and fires the moment any of them breaks a key level - faster than any human.',
@@ -275,9 +248,7 @@ export const LESSONS = [
       { term: 'Backtest', def: 'Running a strategy on historical data to estimate its edge.' },
       { term: 'Kill switch', def: 'A safeguard that halts the bot when losses exceed a limit.' },
     ],
-    chart: {
-      series: buildBreakoutSeries(),
-      overlays: [],
+    chart: { series: buildBreakoutSeries(), overlays: [],
       bands: [
         { at: 102, label: 'Breakout level', color: 'var(--status-paused)' },
         { at: 98, label: 'Range floor', color: 'var(--text-muted)' },

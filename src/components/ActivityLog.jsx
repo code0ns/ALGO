@@ -1,20 +1,9 @@
 import React, { useState } from 'react';
 import {
-  ShoppingCart,
-  ShieldCheck,
-  Repeat,
-  ArrowDownToLine,
-  FileText,
-  ChevronDown,
+  ShoppingCart, ShieldCheck, Repeat, ArrowDownToLine, FileText, ChevronDown,
 } from 'lucide-react';
 import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ReferenceDot,
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, ReferenceDot,
 } from 'recharts';
 import { MOCK_ACTIVITY, formatPrice } from '../data/mock';
 
@@ -26,8 +15,6 @@ const ICONS = {
   report: FileText,
 };
 
-// "What the autopilot did" feed. Entries with a `trade` payload expand on click to
-// show a price mini-chart, position size, entry/current price, and live P&L.
 export default function ActivityLog() {
   const [openId, setOpenId] = useState(null);
 
@@ -53,15 +40,7 @@ export default function ActivityLog() {
               </div>
               {expandable && <TradePnlPill trade={entry.trade} />}
               {expandable && (
-                <ChevronDown
-                  size={16}
-                  style={{
-                    color: 'var(--text-muted)',
-                    transition: 'transform 0.15s ease',
-                    transform: isOpen ? 'rotate(180deg)' : 'none',
-                    flexShrink: 0,
-                  }}
-                />
+                <ChevronDown size={16} style={{ color: 'var(--text-muted)', transition: 'transform 0.15s ease', transform: isOpen ? 'rotate(180deg)' : 'none', flexShrink: 0 }} />
               )}
             </button>
 
@@ -124,31 +103,15 @@ function TradeDetail({ trade }) {
               tickFormatter={(v) => `$${v.toFixed(0)}`}
             />
             <Tooltip
-              contentStyle={{
-                backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '12px',
-              }}
+              contentStyle={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', fontSize: '12px' }}
               formatter={(v) => [formatPrice(v), 'Price']}
               labelFormatter={() => ''}
             />
-            <Area
-              type="monotone"
-              dataKey="price"
+            <Area type="monotone" dataKey="price"
               stroke={positive ? 'var(--status-active)' : '#c92a2a'}
-              strokeWidth={2}
-              fill={`url(#tradeFill-${trade.symbol})`}
-              isAnimationActive={false}
-            />
-            <ReferenceDot
-              x={0}
-              y={trade.entryPrice}
-              r={5}
-              fill="var(--status-active)"
-              stroke="var(--bg-secondary)"
-              strokeWidth={2}
-            />
+              strokeWidth={2} fill={`url(#tradeFill-${trade.symbol})`} isAnimationActive={false} />
+            <ReferenceDot x={0} y={trade.entryPrice} r={5}
+              fill="var(--status-active)" stroke="var(--bg-secondary)" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
