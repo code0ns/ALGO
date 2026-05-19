@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, ArrowRight, Settings2, BarChart3 } from 'lucide-react';
+import { ShieldCheck, ArrowRight, Settings2, BarChart3, BookOpen } from 'lucide-react';
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -12,9 +12,14 @@ export default function Landing() {
           <ShieldCheck size={24} />
           Infrastructure.
         </div>
-        <button className="btn-outline" onClick={() => navigate('/dashboard')}>
-          Access Dashboard
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button className="btn-ghost" onClick={() => navigate('/learn')}>
+            <BookOpen size={16} /> Learn
+          </button>
+          <button className="btn-outline" onClick={() => navigate('/dashboard')}>
+            See live dashboard
+          </button>
+        </div>
       </header>
 
       <main className="container" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '64px 24px' }}>
@@ -25,9 +30,12 @@ export default function Landing() {
           <p className="text-secondary" style={{ fontSize: '20px', marginBottom: '40px', maxWidth: '480px' }}>
             Like a thermostat for your savings. Set your monthly contributions, adjust your risk limits, and let the infrastructure work for you. No stress, no screens.
           </p>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <button className="btn-primary" onClick={() => navigate('/dashboard')} style={{ fontSize: '16px' }}>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <button className="btn-primary" onClick={() => navigate('/onboarding')} style={{ fontSize: '16px' }}>
               Configure Infrastructure <ArrowRight size={18} />
+            </button>
+            <button className="btn-outline" onClick={() => navigate('/learn')}>
+              <BookOpen size={16} /> Learn the basics first
             </button>
           </div>
         </div>
